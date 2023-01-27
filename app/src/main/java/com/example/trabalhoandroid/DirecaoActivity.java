@@ -36,6 +36,7 @@ public class DirecaoActivity extends AppCompatActivity {
     private static final double latitudePortao = -22.809215000000002;
     private static final double longitudePortao = -43.369333333333333;
     private Location distFinal = new Location("Ponto de chegada");
+    private static final int raio = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class DirecaoActivity extends AppCompatActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location != null) {
             locationListener.onLocationChanged(location);
+
         }
 
         Button botaoVoltar = findViewById(R.id.button_voltar);
@@ -85,6 +87,14 @@ public class DirecaoActivity extends AppCompatActivity {
         @Override
         public void onLocationChanged(@NonNull Location location) {
             double distance = distFinal.distanceTo(location);
+            String auxDist = String.format("%.1f",distance);
+            auxDist = auxDist.replace(',','.');
+            double dist = Double.parseDouble(auxDist);
+
+            if(dist < raio){
+                startActivity(new Intent(DirecaoActivity.this, DestinoActivity.class));
+            }
+
             String gps_info = String.format("Distancia de %.1f metro(s)", distance);
             distancia.setText(gps_info);
         }
