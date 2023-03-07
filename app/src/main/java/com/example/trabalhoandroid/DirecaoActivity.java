@@ -41,16 +41,13 @@ public class DirecaoActivity extends AppCompatActivity {
     private static final int minTimeMS = 50;
     private static final int minDistMetros = 1;
     private static final int locationCode = 2;
-    private static double latitudePortao;// = -22.809215000000002;
-    private static double longitudePortao;// = -43.369333333333333;
     private Location distFinal = new Location("Ponto de chegada");
     private static final int raio = 5;
     private String resultadoHttp;
-    private float[] matrizGravidade     = new float[3],
-                    matrizGeoMagnetica  = new float[3],
-                    matrizOrientacao    = new float[3],
-                    matrizRotacao       = new float[9];
-    private boolean temBussola = true;
+    private float[] matrizGravidade     = new float[3];
+    private float[] matrizGeoMagnetica  = new float[3];
+    private float[] matrizOrientacao    = new float[3];
+    private float[] matrizRotacao       = new float[9];
     private ImageView imagem;
     private float anguloPontoDestino;
 
@@ -78,9 +75,6 @@ public class DirecaoActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         //---------------------------------- Fim Requisição ----------------------------------\\
-
-        //distFinal.setLatitude(latitudePortao);
-        //distFinal.setLongitude(longitudePortao);
         distancia = findViewById(R.id.textDistancia);
         imagem = findViewById(R.id.seta);
 
@@ -239,9 +233,7 @@ public class DirecaoActivity extends AppCompatActivity {
             if (matrizGravidade != null && matrizGeoMagnetica != null) {
                 float I[] = new float[9];
 
-                boolean success = SensorManager.getRotationMatrix(matrizRotacao, I, matrizGravidade, matrizGeoMagnetica);
-
-                if (success) {
+                if(SensorManager.getRotationMatrix(matrizRotacao, I, matrizGravidade, matrizGeoMagnetica) == true){
                     SensorManager.getOrientation(matrizRotacao, matrizOrientacao);
                     float angulo = (float) (-matrizOrientacao[0]*180/3.14159);
                     imagem.setRotation(angulo + 180 + anguloPontoDestino);
@@ -253,37 +245,5 @@ public class DirecaoActivity extends AppCompatActivity {
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
         }
-    }
-    private class AccelerometerSensorListener implements SensorEventListener {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            matrizGravidade = event.values;
-
-            if (temBussola){
-                SensorManager.getRotationMatrix(matrizRotacao, null, matrizGravidade, matrizGeoMagnetica);
-                SensorManager.getOrientation(matrizRotacao, matrizOrientacao);
-                float angulo = (float) (-matrizOrientacao[0]*180/3.14159);
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
-    }
-
-    private class MagnetSensorListener implements SensorEventListener{
-
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            matrizGeoMagnetica = event.values;
-
-            if (temBussola){
-                SensorManager.getRotationMatrix(matrizRotacao, null, matrizGravidade, matrizGeoMagnetica);
-                SensorManager.getOrientation(matrizRotacao, matrizOrientacao);
-                float angulo = (float) (-matrizOrientacao[0]*180/3.14159);
-            }
-        }
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {}
     }
 }
